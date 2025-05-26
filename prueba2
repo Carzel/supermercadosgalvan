@@ -1,0 +1,102 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { ShoppingCart, Search, X } from "lucide-react";
+
+const products = Array.from({ length: 20 }).map((_, i) => ({
+  id: i + 1,
+  name: `Producto ${i + 1}`,
+  description: `Descripción del producto ${i + 1}`,
+  price: `$${(Math.random() * 10000 + 1000).toFixed(0)}`,
+  image: `https://picsum.photos/seed/producto${i + 1}/300/200`
+}));
+
+export default function HomePage() {
+  const [cart, setCart] = useState([]);
+  const [showCart, setShowCart] = useState(false);
+
+  const addToCart = (item) => {
+    setCart((prev) => [...prev, item]);
+  };
+
+  const removeFromCart = (index) => {
+    setCart((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 p-4">
+      <header className="flex justify-between items-center py-4 bg-white shadow-md px-4 rounded-xl">
+        <h1 className="text-3xl font-extrabold text-green-700">SúperFácil</h1>
+        <div className="flex items-center space-x-2">
+          <Input placeholder="¿Qué estás buscando hoy?" className="w-64" />
+          <Button variant="outline"><Search className="w-4 h-4" /></Button>
+          <Button variant="ghost" onClick={() => setShowCart(!showCart)}>
+            <ShoppingCart className="w-6 h-6" />
+            {cart.length > 0 && <span className="ml-1 text-sm">({cart.length})</span>}
+          </Button>
+        </div>
+      </header>
+
+      {showCart && (
+        <div className="fixed top-0 right-0 w-full md:w-96 h-full bg-white shadow-lg z-50 p-4 overflow-y-auto">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Tu carrito</h2>
+            <Button variant="ghost" onClick={() => setShowCart(false)}><X className="w-5 h-5" /></Button>
+          </div>
+          {cart.length === 0 ? (
+            <p className="text-gray-500">Tu carrito está vacío.</p>
+          ) : (
+            <ul className="space-y-4">
+              {cart.map((item, index) => (
+                <li key={index} className="flex justify-between items-center border-b pb-2">
+                  <div>
+                    <p className="font-medium">{item.name}</p>
+                    <p className="text-sm text-gray-500">{item.price}</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => removeFromCart(index)}>Eliminar</Button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {cart.length > 0 && (
+            <div className="mt-6">
+              <Button className="w-full">Ir al Checkout</Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+        {['Verduras', 'Carnes', 'Lácteos', 'Limpieza'].map((cat, i) => (
+          <Card key={i} className="cursor-pointer hover:shadow-md transition bg-white rounded-xl">
+            <CardContent className="p-4 text-center font-semibold text-blue-600">
+              {cat}
+            </CardContent>
+          </Card>
+        ))}
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-2xl font-bold mb-4 text-green-800">Todos los productos</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {products.map((product) => (
+            <Card key={product.id} className="bg-white shadow-md rounded-xl">
+              <CardContent className="p-4">
+                <img src={product.image} alt={product.name} className="mb-2 w-full h-40 object-cover rounded-md" />
+                <p className="font-semibold text-lg text-gray-800">{product.name}</p>
+                <p className="text-sm text-gray-500 mb-1">{product.description}</p>
+                <div className="mt-2 flex justify-between items-center">
+                  <span className="text-green-600 font-bold">{product.price}</span>
+                  <Button variant="default" size="sm" onClick={() => addToCart(product)}>
+                    Agregar
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
